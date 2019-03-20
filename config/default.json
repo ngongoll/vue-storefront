@@ -1,7 +1,7 @@
 {
   "server": {
     "host": "localhost",
-    "port": 3000,
+    "port": 13000,
     "protocol": "http",
     "api": "api",
     "devServiceWorker": false,
@@ -39,8 +39,7 @@
     "useUrlDispatcher": true
   },
   "console": {
-    "showErrorOnProduction": true,
-    "verbosityLevel": "display-everything"
+    "verbosityLevel": "only-errors"
   },
   "redis": {
     "host": "localhost",
@@ -48,13 +47,13 @@
     "db": 0
   },
   "graphql": {
-    "host": "localhost",
-    "port": 8080
+    "host": "http://vue.highdigital.de",
+    "port": 18080
   },
   "elasticsearch": {
     "httpAuth": "",
-    "host": "localhost:8080/api/catalog",
-    "index": "vue_storefront_catalog",
+    "host": "http://vue.highdigital.de/api/catalog",
+    "index": "vue",
     "min_score": 0.02,
     "csrTimeout": 5000,
     "ssrTimeout": 1000,
@@ -111,8 +110,7 @@
   "storeViews": {
     "multistore": false,
     "mapStoreUrlsFor": [
-      "de",
-      "it"
+      "de"
     ],
     "de": {
       "storeCode": "de",
@@ -121,11 +119,11 @@
       "name": "German Store",
       "url": "/de",
       "elasticsearch": {
-        "host": "localhost:8080/api/catalog",
-        "index": "vue_storefront_catalog_de"
+        "host": "http://vue.highdigital.de/api/catalog",
+        "index": "vue_21"
       },
       "tax": {
-        "sourcePriceIncludesTax": false,
+        "sourcePriceIncludesTax": true,
         "defaultCountry": "DE",
         "defaultRegion": "",
         "calculateServerSide": true
@@ -136,33 +134,6 @@
         "defaultLanguage": "DE",
         "defaultCountry": "DE",
         "defaultLocale": "de-DE",
-        "currencyCode": "EUR",
-        "currencySign": "EUR",
-        "dateFormat": "HH:mm D-M-YYYY"
-      }
-    },
-    "it": {
-      "storeCode": "it",
-      "disabled": true,
-      "storeId": 4,
-      "name": "Italian Store",
-      "url": "/it",
-      "elasticsearch": {
-        "host": "localhost:8080/api/catalog",
-        "index": "vue_storefront_catalog_it"
-      },
-      "tax": {
-        "sourcePriceIncludesTax": false,
-        "defaultCountry": "IT",
-        "defaultRegion": "",
-        "calculateServerSide": true
-      },
-      "i18n": {
-        "fullCountryName": "Italy",
-        "fullLanguageName": "Italian",
-        "defaultCountry": "IT",
-        "defaultLanguage": "IT",
-        "defaultLocale": "it-IT",
         "currencyCode": "EUR",
         "currencySign": "EUR",
         "dateFormat": "HH:mm D-M-YYYY"
@@ -404,17 +375,17 @@
     "askBeforeRemoveProduct": true,
     "displayItemDiscounts": true,
     "minicartCountType": "quantities",
-    "create_endpoint": "http://localhost:8080/api/cart/create?token={{token}}",
-    "updateitem_endpoint": "http://localhost:8080/api/cart/update?token={{token}}&cartId={{cartId}}",
-    "deleteitem_endpoint": "http://localhost:8080/api/cart/delete?token={{token}}&cartId={{cartId}}",
-    "pull_endpoint": "http://localhost:8080/api/cart/pull?token={{token}}&cartId={{cartId}}",
-    "totals_endpoint": "http://localhost:8080/api/cart/totals?token={{token}}&cartId={{cartId}}",
-    "paymentmethods_endpoint": "http://localhost:8080/api/cart/payment-methods?token={{token}}&cartId={{cartId}}",
-    "shippingmethods_endpoint": "http://localhost:8080/api/cart/shipping-methods?token={{token}}&cartId={{cartId}}",
-    "shippinginfo_endpoint": "http://localhost:8080/api/cart/shipping-information?token={{token}}&cartId={{cartId}}",
-    "collecttotals_endpoint": "http://localhost:8080/api/cart/collect-totals?token={{token}}&cartId={{cartId}}",
-    "deletecoupon_endpoint": "http://localhost:8080/api/cart/delete-coupon?token={{token}}&cartId={{cartId}}",
-    "applycoupon_endpoint": "http://localhost:8080/api/cart/apply-coupon?token={{token}}&cartId={{cartId}}&coupon={{coupon}}"
+    "create_endpoint": "http://vue.highdigital.de/api/cart/create?token={{token}}",
+    "updateitem_endpoint": "http://vue.highdigital.de/api/cart/update?token={{token}}&cartId={{cartId}}",
+    "deleteitem_endpoint": "http://vue.highdigital.de/api/cart/delete?token={{token}}&cartId={{cartId}}",
+    "pull_endpoint": "http://vue.highdigital.de/api/cart/pull?token={{token}}&cartId={{cartId}}",
+    "totals_endpoint": "http://vue.highdigital.de/api/cart/totals?token={{token}}&cartId={{cartId}}",
+    "paymentmethods_endpoint": "http://vue.highdigital.de/api/cart/payment-methods?token={{token}}&cartId={{cartId}}",
+    "shippingmethods_endpoint": "http://vue.highdigital.de/api/cart/shipping-methods?token={{token}}&cartId={{cartId}}",
+    "shippinginfo_endpoint": "http://vue.highdigital.de/api/cart/shipping-information?token={{token}}&cartId={{cartId}}",
+    "collecttotals_endpoint": "http://vue.highdigital.de/api/cart/collect-totals?token={{token}}&cartId={{cartId}}",
+    "deletecoupon_endpoint": "http://vue.highdigital.de/api/cart/delete-coupon?token={{token}}&cartId={{cartId}}",
+    "applycoupon_endpoint": "http://vue.highdigital.de/api/cart/apply-coupon?token={{token}}&cartId={{cartId}}&coupon={{coupon}}"
   },
   "products": {
     "useShortCatalogUrls": false,
@@ -424,18 +395,19 @@
     "configurableChildrenStockPrefetchDynamic": false,
     "configurableChildrenStockPrefetchStaticPrefetchCount": 8,
     "filterUnavailableVariants": false,
-    "listOutOfStockProducts": true,
+    "listOutOfStockProducts": false,
     "preventConfigurableChildrenDirectAccess": true,
     "alwaysSyncPlatformPricesOver": false,
     "clearPricesBeforePlatformSync": false,
     "waitForPlatformSync": false,
     "setupVariantByAttributeCode": true,
-    "endpoint": "http://localhost:8080/api/product",
+    "endpoint": "http://vue.highdigital.de/api/product",
     "defaultFilters": [
       "color",
       "size",
       "price",
-      "erin_recommends"
+      "luggage_size",
+      "hzt_material"
     ],
     "filterFieldMapping": {
       "category.name": "category.name.keyword"
@@ -467,7 +439,7 @@
   },
   "orders": {
     "directBackendSync": true,
-    "endpoint": "http://localhost:8080/api/order",
+    "endpoint": "http://vue.highdigital.de/api/order",
     "payment_methods_mapping": {
     },
     "offline_orders": {
@@ -483,43 +455,43 @@
   "localForage": {
     "defaultDrivers": {
       "user": "LOCALSTORAGE",
-      "cmspage": "LOCALSTORAGE",
-      "cmsblock": "LOCALSTORAGE",
+      "cmspage": "INDEXEDDB",
+      "cmsblock": "INDEXEDDB",
       "carts": "LOCALSTORAGE",
       "orders": "LOCALSTORAGE",
-      "wishlist": "LOCALSTORAGE",
-      "categories": "LOCALSTORAGE",
+      "wishlist": "INDEXEDDB",
+      "categories": "INDEXEDDB",
       "attributes": "LOCALSTORAGE",
       "products": "INDEXEDDB",
-      "elasticCache": "LOCALSTORAGE",
+      "elasticCache": "INDEXEDDB",
       "claims": "LOCALSTORAGE",
       "syncTasks": "LOCALSTORAGE",
-      "ordersHistory": "LOCALSTORAGE",
+      "ordersHistory": "INDEXEDDB",
       "checkoutFieldValues": "LOCALSTORAGE"
     }
   },
   "reviews": {
-    "create_endpoint": "http://localhost:8080/api/review/create"
+    "create_endpoint": "http://vue.highdigital.de/api/review/create"
   },
   "users": {
     "autoRefreshTokens": true,
-    "endpoint": "http://localhost:8080/api/user",
-    "history_endpoint": "http://localhost:8080/api/user/order-history?token={{token}}",
-    "resetPassword_endpoint": "http://localhost:8080/api/user/reset-password",
-    "changePassword_endpoint": "http://localhost:8080/api/user/change-password?token={{token}}",
-    "login_endpoint": "http://localhost:8080/api/user/login",
-    "create_endpoint": "http://localhost:8080/api/user/create",
-    "me_endpoint": "http://localhost:8080/api/user/me?token={{token}}",
-    "refresh_endpoint": "http://localhost:8080/api/user/refresh"
+    "endpoint": "http://vue.highdigital.de/api/user",
+    "history_endpoint": "http://vue.highdigital.de/api/user/order-history?token={{token}}",
+    "resetPassword_endpoint": "http://vue.highdigital.de/api/user/reset-password",
+    "changePassword_endpoint": "http://vue.highdigital.de/api/user/change-password?token={{token}}",
+    "login_endpoint": "http://vue.highdigital.de/api/user/login",
+    "create_endpoint": "http://vue.highdigital.de/api/user/create",
+    "me_endpoint": "http://vue.highdigital.de/api/user/me?token={{token}}",
+    "refresh_endpoint": "http://vue.highdigital.de/api/user/refresh"
   },
   "stock": {
     "synchronize": true,
     "allowOutOfStockInCart": true,
-    "endpoint": "http://localhost:8080/api/stock"
+    "endpoint": "http://vue.highdigital.de/api/stock"
   },
   "images": {
     "useExactUrlsNoProxy": false,
-    "baseUrl": "https://demo.vuestorefront.io/img/",
+    "baseUrl": "http://vue.highdigital.de/img/",
     "productPlaceholder": "/assets/placeholder.jpg"
   },
   "install": {
@@ -528,9 +500,9 @@
   },
   "demomode": false,
   "tax": {
-    "defaultCountry": "US",
+    "defaultCountry": "DE",
     "defaultRegion": "",
-    "sourcePriceIncludesTax": false,
+    "sourcePriceIncludesTax": true,
     "calculateServerSide": true
   },
   "shipping": {
@@ -547,8 +519,8 @@
     ]
   },
   "i18n": {
-    "defaultCountry": "US",
-    "defaultLanguage": "EN",
+    "defaultCountry": "DE",
+    "defaultLanguage": "DE",
     "availableLocale": [
       "en-US",
       "de-DE",
@@ -562,27 +534,27 @@
       "pl-PL",
       "cs-CZ"
     ],
-    "defaultLocale": "en-US",
-    "currencyCode": "USD",
-    "currencySign": "$",
-    "currencySignPlacement": "preppend",
+    "defaultLocale": "de-DE",
+    "currencyCode": "EUR",
+    "currencySign": "€",
+    "currencySignPlacement": "append",
     "dateFormat": "HH:mm D/M/YYYY",
-    "fullCountryName": "United States",
-    "fullLanguageName": "English",
+    "fullCountryName": "Germany",
+    "fullLanguageName": "German",
     "bundleAllStoreviewLanguages": true
   },
   "mailchimp": {
-    "endpoint": "http://localhost:8080/api/ext/mailchimp-subscribe/subscribe"
+    "endpoint": "http://vue.highdigital.de/api/ext/mailchimp-subscribe/subscribe"
   },
   "mailer": {
     "endpoint": {
-      "send": "http://localhost:8080/api/ext/mail-service/send-email",
-      "token": "http://localhost:8080/api/ext/mail-service/get-token"
+      "send": "http://vue.highdigital.de/api/ext/mail-service/send-email",
+      "token": "http://vue.highdigital.de/api/ext/mail-service/get-token"
     },
     "contactAddress": "contributors@vuestorefront.io",
     "sendConfirmation": true
   },
-  "theme": "@vue-storefront/theme-default",
+  "theme": "@vue-storefront/hzt",
   "analytics": {
     "id": false
   },
@@ -590,8 +562,8 @@
     "id": false
   },
   "cms": {
-    "endpoint": "http://localhost:8080/api/ext/cms-data/cms{{type}}/{{cmsId}}",
-    "endpointIdentifier": "http://localhost:8080/api/ext/cms-data/cms{{type}}Identifier/{{cmsIdentifier}}/storeId/{{storeId}}"
+    "endpoint": "http://vue.highdigital.de/api/ext/cms-data/cms{{type}}/{{cmsId}}",
+    "endpointIdentifier": "http://vue.highdigital.de/api/ext/cms-data/cms{{type}}Identifier/{{cmsIdentifier}}/storeId/{{storeId}}"
   },
   "cms_block": {
     "max_count": 500
@@ -617,7 +589,7 @@
         {
           "key": "category.name",
           "value": {
-            "eq": "Tees"
+            "eq": "Trauringe & Eheringe"
           }
         }
       ]
