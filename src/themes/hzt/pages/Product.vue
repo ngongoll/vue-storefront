@@ -6,6 +6,7 @@
           <div class="col-xs-12 col-md-6 center-xs middle-xs image">
             <product-gallery
               :gallery="gallery"
+              :offline="offlineImage"
               :configuration="configuration"
               :product="product"
             />
@@ -21,7 +22,7 @@
               <web-share :title="product.name | htmlDecode" text="Check this product!" class="web-share"/>
             </h1>
             <div class="mb20 uppercase cl-secondary">
-              sku: {{ product.sku }}
+              Lieferzeit: {{ product.delivery_time }}
             </div>
             <div itemprop="offers" itemscope itemtype="http://schema.org/Offer">
               <meta itemprop="priceCurrency" :content="currentStore.i18n.currencyCode">
@@ -48,6 +49,12 @@
                   {{ product.qty > 0 ? product.priceInclTax * product.qty : product.priceInclTax | price }}
                 </div>
               </div>
+              <div class="mb20 cl-secondary">
+                Inkl. 19% USt., inkl. Versandkosten*
+              </div>
+              <div class="mb20 cl-secondary">
+                {{ product.short_description }}
+              </div>
               <div
                 class="cl-primary variants"
                 v-if="product.type_id =='configurable' && !loading"
@@ -63,9 +70,6 @@
                 >
                   <div class="variants-label" data-testid="variantsLabel">
                     {{ option.label }}
-                    <span class="weight-700">
-                      {{ configuration[option.attribute_code ? option.attribute_code : option.label.toLowerCase()].label }}
-                    </span>
                   </div>
                   <div class="row top-xs m0 pt15 pb40 variants-wrapper">
                     <div v-if="option.label == 'Color'">
@@ -158,30 +162,6 @@
                 class="col-xs-12 col-sm-4 col-md-6"
               />
             </div>
-            <div class="row py40 add-to-buttons">
-              <div class="col-xs-6 col-sm-3 col-md-6">
-                <wishlist-button :product="product" />
-              </div>
-              <div class="col-xs-6 col-sm-3 col-md-6 product__add-to-compare">
-                <button
-                  @click="isOnCompare ? removeFromList('compare') : addToList('compare')"
-                  class="
-                    p0 inline-flex middle-xs bg-cl-transparent brdr-none
-                    action h5 pointer cl-secondary
-                  "
-                  type="button"
-                  data-testid="addToCompare"
-                >
-                  <i class="pr5 material-icons">compare</i>
-                  <template v-if="!isOnCompare">
-                    {{ $t('Add to compare') }}
-                  </template>
-                  <template v-else>
-                    {{ $t('Remove from compare') }}
-                  </template>
-                </button>
-              </div>
-            </div>
           </div>
         </section>
       </div>
@@ -220,7 +200,6 @@
         </div>
       </div>
     </section>
-    <reviews v-show="OnlineOnly"/>
     <related-products
       type="upsell"
       :heading="$t('We found other products you might like')"

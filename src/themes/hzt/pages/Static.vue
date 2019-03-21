@@ -29,8 +29,20 @@
 <script>
 import i18n from '@vue-storefront/i18n'
 import Breadcrumbs from 'theme/components/core/Breadcrumbs'
-import StaticExample from 'theme/components/theme/blocks/Static/Example'
-import StaticShortExample from 'theme/components/theme/blocks/Static/Short'
+import StaticAgb from 'theme/components/theme/blocks/Static/Agb'
+import StaticDatenschutz from 'theme/components/theme/blocks/Static/Datenschutz'
+import StaticDiamanten from 'theme/components/theme/blocks/Static/Diamanten'
+import StaticFreundschaftsringe from 'theme/components/theme/blocks/Static/Freundschaftsringe'
+import StaticGravur from 'theme/components/theme/blocks/Static/Gravur'
+import StaticHilfe from 'theme/components/theme/blocks/Static/Hilfe'
+import StaticImpressum from 'theme/components/theme/blocks/Static/Impressum'
+import StaticLegierung from 'theme/components/theme/blocks/Static/Legierungen'
+import StaticLieferung from 'theme/components/theme/blocks/Static/Lieferung'
+import StaticPartnerringe from 'theme/components/theme/blocks/Static/Partnerringe'
+import StaticRinggroesse from 'theme/components/theme/blocks/Static/Ringgroesse'
+import StaticRingmass from 'theme/components/theme/blocks/Static/Ringmass'
+import StaticSchweiz from 'theme/components/theme/blocks/Static/Schweiz'
+import StaticWiderruf from 'theme/components/theme/blocks/Static/Widerruf'
 
 export default {
   components: {
@@ -42,6 +54,9 @@ export default {
       meta: this.$route.meta.description ? [{vmid: 'description', description: this.$route.meta.description}] : []
     }
   },
+  created () {
+    this.activeComponent = this.navigation.find(nav => nav.link === this.$route.path) ? this.navigation.find(nav => nav.link === this.$route.path).component : null
+  },
   props: {
     title: {
       type: String,
@@ -52,24 +67,30 @@ export default {
       required: true
     }
   },
-  computed: {
-    activeComponent () {
-      const matchedNav = this.navigation.find(nav => nav.link === this.$route.path)
-      return matchedNav ? matchedNav.component : null
+  methods: {
+    setContent (component) {
+      this.activeComponent = component
     }
   },
   data () {
     return {
       navigation: [
-        { title: i18n.t('About us'), link: '/about-us', component: StaticExample },
-        { title: i18n.t('Customer service'), link: '/customer-service', component: StaticShortExample },
-        { title: i18n.t('Store locator'), link: '/store-locator', component: StaticExample },
-        { title: i18n.t('Delivery'), link: '/delivery', component: StaticShortExample },
-        { title: i18n.t('Return policy'), link: '/returns', component: StaticExample },
-        { title: i18n.t('Privacy policy'), link: '/privacy', component: StaticShortExample },
-        { title: i18n.t('Size guide'), link: '/size-guide', component: StaticExample },
-        { title: i18n.t('Contact us'), link: '/contact', component: StaticShortExample }
-      ]
+        { title: i18n.t('AGB'), link: '/agb', component: StaticAgb },
+        { title: i18n.t('Datenschutz'), link: '/datenschutz', component: StaticDatenschutz },
+        { title: i18n.t('Diamanten'), link: '/diamanten', component: StaticDiamanten },
+        { title: i18n.t('Freundschaftsringe'), link: '/freundschaftsringe', component: StaticFreundschaftsringe },
+        { title: i18n.t('Individuelle Gravur'), link: '/individuelle-Gravur', component: StaticGravur },
+        { title: i18n.t('Hilfe'), link: '/hilfe', component: StaticHilfe },
+        { title: i18n.t('Impressum'), link: '/impressum', component: StaticImpressum },
+        { title: i18n.t('Legierung'), link: '/legierungen', component: StaticLegierung },
+        { title: i18n.t('Lieferung'), link: '/lieferung', component: StaticLieferung },
+        { title: i18n.t('Partnerringe'), link: '/partnerringe', component: StaticPartnerringe },
+        { title: i18n.t('Ringgröße'), link: '/ringgroesse', component: StaticRinggroesse },
+        { title: i18n.t('Ringmaß ermitteln'), link: '/ringmass-senden', component: StaticRingmass },
+        { title: i18n.t('Schweiz'), link: '/schweiz', component: StaticSchweiz },
+        { title: i18n.t('Widerrufsrecht'), link: '/widerruf', component: StaticWiderruf }
+      ],
+      activeComponent: null
     }
   }
 }
