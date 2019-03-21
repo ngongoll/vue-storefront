@@ -1,32 +1,92 @@
 {
   "mainBanners": [
-	  {
-	    "title": "Office casual",
-	    "subtitle": "Collection",
-	    "image": "/assets/ban1.jpg",
-	    "link": "/c/women-20"
-	  }
+    {
+      "title": "Luma Performance",
+      "subtitle": "Collection",
+      "image": "",
+      "link": "/c/women-20"
+    }
   ],
   "smallBanners": [
     {
-      "title": "Shine on",
-      "subtitle": "Accesories",
-      "image": "/assets/ban2.jpg",
+      "title": "Weißgold",
+      "subtitle": "",
+      "image": "/assets/materials/Banner_350x189_Wei_gold.jpg",
       "link": "/c/men-11"
     },
     {
-      "title": "Spring is coming",
-      "subtitle": "Hats",
-      "image": "/assets/ban3.jpg",
+      "title": "Platin",
+      "subtitle": "",
+      "image": "/assets/materials/Banner_350x189_Platin.jpg",
+      "link": "/c/gear-3"
+    },
+    {
+      "title": "Titan",
+      "subtitle": "",
+      "image": "/assets/materials/Banner_350x189_Titan.jpg",
+      "link": "/c/gear-3"
+    },
+    {
+      "title": "Carbon",
+      "subtitle": "",
+      "image": "/assets/materials/Banner_350x189_Carbon.jpg",
+      "link": "/c/men-11"
+    },
+    {
+      "title": "Bicolor",
+      "subtitle": "",
+      "image": "/assets/materials/Banner_350x189_Bicolor.jpg",
+      "link": "/c/gear-3"
+    },
+    {
+      "title": "Silber",
+      "subtitle": "",
+      "image": "/assets/materials/Silber_Banner_350.jpg",
+      "link": "/c/gear-3"
+    },
+    {
+      "title": "Gelbgold",
+      "subtitle": "",
+      "image": "/assets/materials/Banner_350x189_Gelbgold.jpg",
+      "link": "/c/men-11"
+    },
+    {
+      "title": "Palladium",
+      "subtitle": "",
+      "image": "/assets/materials/Banner_350x189_Palladium.jpg",
+      "link": "/c/gear-3"
+    },
+    {
+      "title": "Edelstahl",
+      "subtitle": "",
+      "image": "/assets/materials/Banner_350x189_Edelstahl-Gold.jpg",
+      "link": "/c/gear-3"
+    },
+    {
+      "title": "Rotgold",
+      "subtitle": "",
+      "image": "/assets/materials/Banner_350x189_Rosegold.jpg",
+      "link": "/c/men-11"
+    },
+    {
+      "title": "Tantal",
+      "subtitle": "",
+      "image": "/assets/materials/tatal_Ringe.jpg",
+      "link": "/c/gear-3"
+    },
+    {
+      "title": "Schmuck",
+      "subtitle": "",
+      "image": "/assets/materials/teno.jpg",
       "link": "/c/gear-3"
     }
   ],
   "productBanners": [
-	  {
-	    "title": "Spring is coming",
-	    "subtitle": "Hats",
-	    "image": "/assets/ban3.jpg",
-	    "link": "/c/gear-3"
-	  }
+    {
+      "title": "Eco-friendly",
+      "subtitle": "Sales",
+      "image": "/assets/ig/ig05.jpg",
+      "link": "/c/gear-3"
+    }
   ]
 }
