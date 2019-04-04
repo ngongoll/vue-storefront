@@ -138,7 +138,7 @@
               :product="product"
             />
             <product-custom-options
-              v-else-if="product.custom_options && product.custom_options.length > 0 && !loading"
+              v-if="product.custom_options && Object.keys(product.custom_options).length > 0"
               :product="product"
             />
             <div class="row m0 mb35" v-if="product.type_id !== 'grouped' && product.type_id !== 'bundle'">
