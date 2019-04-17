@@ -30,6 +30,7 @@
 <script>
 // query constructor
 import { prepareQuery } from '@vue-storefront/core/modules/catalog/queries/common'
+import { isServer } from '@vue-storefront/core/helpers'
 
 // Core pages
 import Home from '@vue-storefront/core/pages/Home'
@@ -43,6 +44,8 @@ import Onboard from 'theme/components/theme/blocks/Home/Onboard'
 import PromotedOffers from 'theme/components/theme/blocks/PromotedOffers/PromotedOffers'
 import TileLinks from 'theme/components/theme/blocks/TileLinks/TileLinks'
 import { Logger } from '@vue-storefront/core/lib/logger'
+import { mapGetters } from 'vuex'
+
 export default {
   mixins: [Home],
   components: {
@@ -53,6 +56,7 @@ export default {
     TileLinks
   },
   computed: {
+    ...mapGetters('user', ['isLoggedIn']),
     categories () {
       return this.getCategories
     },
@@ -76,6 +80,15 @@ export default {
       }
     }
   },
+  mounted () {
+    if (!this.isLoggedIn && localStorage.getItem('redirect')) this.$bus.$emit('modal-show', 'modal-signup')
+  },
+  watch: {
+    isLoggedIn () {
+      this.$router.push(localStorage.getItem('redirect'))
+      localStorage.removeItem('redirect')
+    }
+  },
   async asyncData ({ store, route }) { // this is for SSR purposes to prefetch data
     const config = store.state.config
 
@@ -87,8 +100,7 @@ export default {
     const newProductsResult = await store.dispatch('product/list', {
       query: newProductsQuery,
       size: 8,
-      sort: 'created_at:desc',
-      includeFields: config.entities.optimize ? (config.products.setFirstVarianAsDefaultInURL ? config.entities.productListWithChildren.includeFields : config.entities.productList.includeFields) : []
+      sort: 'created_at:desc'
     })
     if (newProductsResult) {
       store.state.homepage.new_collection = newProductsResult.items
@@ -106,6 +118,20 @@ export default {
 
     await store.dispatch('promoted/updateHeadImage')
     await store.dispatch('promoted/updatePromotedOffers')
+  },
+  beforeRouteEnter (to, from, next) {
+    if (!isServer && !from.name) { // Loading products to cache on SSR render
+      next(vm => {
+        let newProductsQuery = prepareQuery({ queryConfig: 'newProducts' })
+        vm.$store.dispatch('product/list', {
+          query: newProductsQuery,
+          size: 8,
+          sort: 'created_at:desc'
+        })
+      })
+    } else {
+      next()
+    }
   }
 }
 </script>
