@@ -39,6 +39,7 @@
             v-model="inputValues[('customOption_' + option.option_id)]"
           ><label class="pl10 lh20 h4 pointer" :for="('customOption_' + opval.option_type_id)" v-html="opval.title" />
         </div>
+        <span class="error" v-if="validation.results[('customOption_' + option.option_id)].error">{{ validation.results[('customOption_' + option.option_id)].message }}</span>
       </div>
     </div>
   </form>

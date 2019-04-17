@@ -329,6 +329,7 @@ const actions: ActionTree<CartState, RootState> = {
     }
   },
   updateItem ({ commit }, { product }) {
+    console.log(product.product_option.extension_attributes)
     commit(types.CART_UPD_ITEM_PROPS, { product })
   },
   getPaymentMethods (context) {

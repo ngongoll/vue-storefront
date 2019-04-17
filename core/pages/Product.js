@@ -142,8 +142,9 @@ export default {
           }
         }
       }
-      this.product.price = this.originalProduct.price + priceDelta
-      this.product.priceInclTax = this.originalProduct.priceInclTax + priceDeltaInclTax
+      // TODO reset price correctly if priceDelta > 0 and child products have different price
+      this.product.price = this.product.price + parseInt(priceDelta)
+      this.product.priceInclTax = this.product.priceInclTax + parseInt(priceDeltaInclTax)
     },
     onAfterBundleOptionsChanged (payload) {
       let priceDelta = 0

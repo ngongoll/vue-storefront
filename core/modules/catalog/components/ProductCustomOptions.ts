@@ -62,7 +62,7 @@ export const ProductCustomOptions = {
     optionChanged (option, opval = null) {
       const fieldName = _fieldName(option)
       const value = opval === null ? this.inputValues[fieldName] : opval.option_type_id
-      this.validateField(option)
+      // this.validateField(option)
       this.setCustomOptionValue({ optionId: option.option_id, optionValue: value })
       this.$store.dispatch('product/setCustomOptions', { product: this.product, customOptions: this.$store.state.product.current_custom_options }) // TODO: move it to "AddToCart"
       this.selectedOptions[fieldName] = (opval === null ? value : opval)

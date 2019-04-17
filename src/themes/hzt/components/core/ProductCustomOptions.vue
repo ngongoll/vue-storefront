@@ -15,7 +15,7 @@
           v-model="inputValues[('customOption_' + option.option_id)]"
           :placeholder="option.title"
           @change="optionChanged(option)">
-        <div class="m5 relative" v-for="opval in option.values" :key="opval.option_type_id" v-if="option.type === 'radio'|| option.type === 'drop_down'">
+        <div class="m5 relative" v-for="opval in option.values" :key="opval.option_type_id" v-if="option.type === 'radio' || option.type === 'select' || option.type === 'drop_down'">
           <input
             @change="optionChanged(option, opval)"
             type="radio"
@@ -26,11 +26,6 @@
             :value="opval.option_type_id"
             v-model="inputValues[('customOption_' + option.option_id)]"
           ><label class="pl10 lh20 h4 pointer" :for="('customOption_' + opval.option_type_id)" v-html="opval.title" />
-        </div>
-        <div class="m5 relative" v-if="option.type === 'select' || option.type === 'drop_downd'">
-          <select v-model="selectedOptions" :name="('customOption_' + option.option_id)" @change="optionChanged()">
-            <option v-for="opval in option.values" :value="opval.option_type_id" :key="opval.option_type_id">{{ opval.title }}</option>
-          </select>
         </div>
         <div class="m5 relative" v-for="opval in option.values" :key="opval.option_type_id" v-if="option.type === 'checkbox'">
           <input

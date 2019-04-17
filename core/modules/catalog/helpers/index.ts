@@ -281,9 +281,9 @@ function _prepareProductOption (product) {
       bundle_options: []
     }
   }
-  /* if (product.product_option) {
+  if (product.product_option) {
     product_option = product.product_option
-  } */
+  }
   return product_option
 }
 export function setConfigurableProductOptionsAsync (context, { product, configuration }) {
