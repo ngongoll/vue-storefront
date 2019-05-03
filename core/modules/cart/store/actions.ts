@@ -43,6 +43,41 @@ function _afterServerItemUpdated (event, clientItem = null) {
   }
 }
 
+function objectToString (obj) {
+  var str = '';
+  var i=0;
+  for (var key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      if(typeof obj[key] == 'object')
+      {
+        if(obj[key] instanceof Array)
+        {
+          str+= key + ' : [ ';
+          for(var j=0;j<obj[key].length;j++)
+          {
+            if(typeof obj[key][j]=='object') {
+              str += '{' + objectToString(obj[key][j]) + (j > 0 ? ',' : '') + '}';
+            }
+            else
+            {
+              str += '\'' + obj[key][j] + '\'' + (j > 0 ? ',' : ''); //non objects would be represented as strings
+            }
+          }
+          str+= ']' + (i > 0 ? ',' : '')
+        }
+        else
+        {
+          str += key + ' : { ' + objectToString(obj[key]) + '} ' + (i > 0 ? ',' : '');
+        }
+      }
+      else {
+        str +=key + ':\'' + obj[key] + '\'' + (i > 0 ? ',' : '');
+      }
+      i++;
+    }
+  }
+  return str;
+}
 const actions: ActionTree<CartState, RootState> = {
   serverTokenClear (context) {
     context.commit(types.CART_LOAD_CART_SERVER_TOKEN, null)
@@ -258,6 +293,8 @@ const actions: ActionTree<CartState, RootState> = {
           continue
         }
       }
+      console.log('additem')
+      console.log(product.product_option.extension_attributes)
       const record = state.cartItems.find(p => p.sku === product.sku)
       dispatch('stock/check', { product: product, qty: record ? record.qty + 1 : (product.qty ? product.qty : 1) }, {root: true}).then(result => {
         product.onlineStockCheckid = result.onlineCheckTaskId // used to get the online check result
@@ -332,7 +369,6 @@ const actions: ActionTree<CartState, RootState> = {
     }
   },
   updateItem ({ commit }, { product }) {
-    console.log(product.product_option.extension_attributes)
     commit(types.CART_UPD_ITEM_PROPS, { product })
   },
   getPaymentMethods (context) {
@@ -562,10 +598,16 @@ const actions: ActionTree<CartState, RootState> = {
       for (const clientItem of clientItems) {
         cartHasItems = true
         const serverItem = serverItems.find((itm) => {
-          return itm.sku === clientItem.sku || itm.sku.indexOf(clientItem.sku + '-') === 0 /* bundle products */
+          console.log('itm try')
+          if (objectToString(itm.product_option.extension_attributes.custom_options) === objectToString(clientItem.product_option.extension_attributes.custom_options)) {
+            console.log('gleich')
+          }
+          return (itm.sku === clientItem.sku || itm.sku.indexOf(clientItem.sku + '-') === 0) && objectToString(itm.product_option.extension_attributes.custom_options) === objectToString(clientItem.product_option.extension_attributes.custom_options) /* bundle products */
         })
-
+        console.log('clientItem.product_option')
+        console.log(objectToString(clientItem.product_option.extension_attributes.custom_options))
         if (!serverItem) {
+          console.log('no server item')
           Logger.warn('No server item with sku ' + clientItem.sku + ' on stock.', 'cart')()
           diffLog.push({ 'party': 'server', 'sku': clientItem.sku, 'status': 'no_item' })
           if (!event.dry_run) {
@@ -585,6 +627,7 @@ const actions: ActionTree<CartState, RootState> = {
             }
           }
         } else if (serverItem.qty !== clientItem.qty) {
+          console.log('server item but qty diff')
           Logger.log('Wrong qty for ' + clientItem.sku, clientItem.qty, serverItem.qty)()
           diffLog.push({ 'party': 'server', 'sku': clientItem.sku, 'status': 'wrong_qty', 'client_qty': clientItem.qty, 'server_qty': serverItem.qty })
           if (!event.dry_run) {
@@ -606,6 +649,7 @@ const actions: ActionTree<CartState, RootState> = {
             }
           }
         } else {
+          console.log('server item')
           Logger.info('Server and client item with SKU ' + clientItem.sku + ' synced. Updating cart.', 'cart', 'cart')()
           // Logger.log('Updating server id to ', { sku: clientItem.sku, server_cart_id: serverItem.quote_id, server_item_id: serverItem.item_id, product_option: serverItem.product_option })()
           if (!event.dry_run) {
