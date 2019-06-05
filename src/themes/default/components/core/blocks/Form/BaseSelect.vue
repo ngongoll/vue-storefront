@@ -9,7 +9,8 @@
       :autocomplete="autocomplete"
       @focus="$emit('focus')"
       @blur="$emit('blur')"
-      @change="$emit('input', $event.target.value)"
+      @change="$emit('change', $event.target.value)"
+      @input="$emit('input', $event.target.value)"
     >
       <option disabled selected value v-if="!selected"/>
       <option
@@ -127,7 +128,6 @@ export default {
     position: absolute;
     pointer-events: none;
     user-select: none;
-    left: 0;
     top: 10px;
     transition: 0.2s ease all;
     -moz-transition: 0.2s ease all;

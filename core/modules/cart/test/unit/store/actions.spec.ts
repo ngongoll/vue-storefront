@@ -5,18 +5,19 @@ import cartActions from '../../../store/actions';
 import config from 'config';
 import rootStore from '@vue-storefront/core/store';
 import { sha3_224 } from 'js-sha3';
-import { TaskQueue } from "../../../../../lib/sync";
+import { TaskQueue } from '../../../../../lib/sync';
 import * as coreHelper from '@vue-storefront/core/helpers';
 import { currentStoreView } from '@vue-storefront/core/lib/multistore';
+import { onlineHelper } from '@vue-storefront/core/helpers';
 
-jest.mock('@vue-storefront/core/store',() => ({
+jest.mock('@vue-storefront/core/store', () => ({
   dispatch: jest.fn(),
   state: {}
 }));
 jest.mock('config', () => ({}));
 jest.mock('@vue-storefront/i18n', () => ({ t: jest.fn(str => str) }));
-jest.mock('js-sha3',() => ({ sha3_224: jest.fn() }));
-jest.mock('@vue-storefront/core/lib/multistore',() => ({
+jest.mock('js-sha3', () => ({ sha3_224: jest.fn() }));
+jest.mock('@vue-storefront/core/lib/multistore', () => ({
   currentStoreView: jest.fn(),
   localizedRoute: jest.fn()
 }));
@@ -30,25 +31,30 @@ jest.mock('@vue-storefront/core/lib/sync', () => ({ TaskQueue: {
   execute: jest.fn()
 }}));
 jest.mock('@vue-storefront/core/app', () => ({ router: jest.fn() }));
+jest.mock('@vue-storefront/core/lib/search/searchQuery', () => jest.fn());
 jest.mock('@vue-storefront/core/helpers', () => ({
-  get isServer() {
+  get isServer () {
     return true
+  },
+  onlineHelper: {
+    get isOnline () {
+      return true
+    }
   }
 }));
-jest.mock('@vue-storefront/core/lib/search/searchQuery', () => jest.fn());
 
 Vue.prototype.$bus = {
   $emit: jest.fn()
 };
 
 describe('Cart actions', () => {
-
   const isServerSpy = jest.spyOn((coreHelper as any).default, 'isServer', 'get');
+  const isOnlineSpy = jest.spyOn(onlineHelper, 'isOnline', 'get');
 
   beforeEach(() => {
     jest.clearAllMocks();
     (rootStore as any).state = {};
-    Object.keys(config).forEach(function(key) { delete config[key]; });
+    Object.keys(config).forEach((key) => { delete config[key]; });
   });
 
   it('serverTokenClear clears cart token', () => {
@@ -73,10 +79,9 @@ describe('Cart actions', () => {
     wrapper(cartActions);
 
     expect(contextMock.commit).toBeCalledWith(types.CART_LOAD_CART, []);
-    expect(contextMock.commit).toBeCalledWith(types.CART_LOAD_CART_SERVER_TOKEN, null);
   });
 
-  it('clear dispatches creating a new cart on server with direct backend sync when its configured', () => {
+  it('clear dispatches creating a new cart on server with direct backend sync when its configured', async () => {
     const contextMock = {
       commit: jest.fn(),
       dispatch: jest.fn()
@@ -87,12 +92,12 @@ describe('Cart actions', () => {
 
     const wrapper = (actions: any) => actions.clear(contextMock);
 
-    wrapper(cartActions);
+    await wrapper(cartActions);
 
-    expect(contextMock.dispatch).toBeCalledWith('serverCreate', { guestCart: false});
+    expect(contextMock.dispatch).toBeCalledWith('serverCreate', {guestCart: false});
   });
 
-  it('clear dispatches creating a new cart on server with queuing when direct backend sync is not configured', () => {
+  it('clear dispatches creating a new cart on server with queuing when direct backend sync is not configured', async () => {
     const contextMock = {
       commit: jest.fn(),
       dispatch: jest.fn()
@@ -103,9 +108,9 @@ describe('Cart actions', () => {
 
     const wrapper = (actions: any) => actions.clear(contextMock);
 
-    wrapper(cartActions);
+    await wrapper(cartActions);
 
-    expect(contextMock.dispatch).toBeCalledWith('serverCreate', { guestCart: true});
+    expect(contextMock.dispatch).toBeCalledWith('serverCreate', {guestCart: true});
   });
 
   it('save dispatches cart save mutation', () => {
@@ -120,16 +125,17 @@ describe('Cart actions', () => {
   });
 
   describe('serverPull', () => {
-
     it('pulls latest cart data and refreshes payment/shipping methods when there are products in cart', async () => {
+      isOnlineSpy.mockReturnValueOnce(true);
       const contextMock = {
+        rootGetters: { checkout: { isUserInCheckout: () => false } },
         dispatch: jest.fn(),
         state: {
           cartItems: [],
           cartServerToken: 'some-token',
           cartItemsHash: 'some-sha-hash',
           cartServerPullAt: 1000000000,
-          cartServerMethodsRefreshAt: 0,
+          cartServerMethodsRefreshAt: 0
         }
       };
 
@@ -147,7 +153,7 @@ describe('Cart actions', () => {
         cartServerToken: 'some-token',
         cartItemsHash: 'new-hash',
         cartServerPullAt: 1000003000,
-        cartServerMethodsRefreshAt: 1000003000,
+        cartServerMethodsRefreshAt: 1000003000
       };
 
       isServerSpy.mockReturnValueOnce(false);
@@ -172,14 +178,16 @@ describe('Cart actions', () => {
     });
 
     it('pulls shipping methods with default country if none is set in shipping details', async () => {
+      isOnlineSpy.mockReturnValueOnce(true);
       const contextMock = {
+        rootGetters: { checkout: { isUserInCheckout: () => false } },
         dispatch: jest.fn(),
         state: {
           cartItems: [],
           cartServerToken: 'some-token',
           cartItemsHash: 'some-sha-hash',
           cartServerPullAt: 1000000000,
-          cartServerMethodsRefreshAt: 0,
+          cartServerMethodsRefreshAt: 0
         }
       };
 
@@ -193,7 +201,7 @@ describe('Cart actions', () => {
       const expectedState = {
         cartItems: [{sku: 'foo'}],
         cartItemsHash: 'new-hash',
-        cartServerPullAt: 1000003000,
+        cartServerPullAt: 1000003000
       };
 
       isServerSpy.mockReturnValueOnce(false);
@@ -217,13 +225,14 @@ describe('Cart actions', () => {
 
     it('doesn\'t update shipping methods if cart is empty', async () => {
       const contextMock = {
+        rootGetters: { checkout: { isUserInCheckout: () => false } },
         dispatch: jest.fn(),
         state: {
           cartItems: [],
           cartServerToken: 'some-token',
           cartItemsHash: 'some-sha-hash',
           cartServerPullAt: 1000000000,
-          cartServerMethodsRefreshAt: 0,
+          cartServerMethodsRefreshAt: 0
         }
       };
 
@@ -239,7 +248,7 @@ describe('Cart actions', () => {
       const expectedState = {
         cartItems: [],
         cartItemsHash: 'new-hash',
-        cartServerPullAt: 1000003000,
+        cartServerPullAt: 1000003000
       };
 
       isServerSpy.mockReturnValueOnce(false);
@@ -259,13 +268,14 @@ describe('Cart actions', () => {
 
     it('doesn\'t update payment methods if they were synced recently', async () => {
       const contextMock = {
+        rootGetters: { checkout: { isUserInCheckout: () => false } },
         dispatch: jest.fn(),
         state: {
           cartItems: [],
           cartServerToken: 'some-token',
           cartItemsHash: 'some-sha-hash',
           cartServerPullAt: 1000000000,
-          cartServerMethodsRefreshAt: 1000000000,
+          cartServerMethodsRefreshAt: 1000000000
         }
       };
 
@@ -274,7 +284,7 @@ describe('Cart actions', () => {
       const expectedState = {
         cartItems: [],
         cartItemsHash: 'new-hash',
-        cartServerPullAt: 1000003000,
+        cartServerPullAt: 1000003000
       };
 
       isServerSpy.mockReturnValueOnce(false);
@@ -291,13 +301,14 @@ describe('Cart actions', () => {
 
     it('doesn\'t update payment methods if they were synced recently', async () => {
       const contextMock = {
+        rootGetters: { checkout: { isUserInCheckout: () => false } },
         dispatch: jest.fn(),
         state: {
           cartItems: [],
           cartServerToken: 'some-token',
           cartItemsHash: 'some-sha-hash',
           cartServerPullAt: 1000000000,
-          cartServerMethodsRefreshAt: 1000000000,
+          cartServerMethodsRefreshAt: 1000000000
         }
       };
 
@@ -306,7 +317,7 @@ describe('Cart actions', () => {
       const expectedState = {
         cartItems: [],
         cartItemsHash: 'new-hash',
-        cartServerPullAt: 1000003000,
+        cartServerPullAt: 1000003000
       };
 
       isServerSpy.mockReturnValueOnce(false);
@@ -324,13 +335,14 @@ describe('Cart actions', () => {
     it('pulls latest cart data and even when the cart was updated recently but the hash has changed' +
       '(so cart items or token wer modified)', () => {
       const contextMock = {
+        rootGetters: { checkout: { isUserInCheckout: () => false } },
         dispatch: jest.fn(),
         state: {
           cartItems: [],
           cartServerToken: 'some-token',
           cartItemsHash: 'some-sha-hash',
           cartServerPullAt: 1000000000,
-          cartServerMethodsRefreshAt: 1000000000,
+          cartServerMethodsRefreshAt: 1000000000
         }
       };
 
@@ -339,7 +351,7 @@ describe('Cart actions', () => {
       const expectedState = {
         cartItems: [],
         cartItemsHash: 'new-hash',
-        cartServerPullAt: 1000000050,
+        cartServerPullAt: 1000000050
       };
 
       isServerSpy.mockReturnValueOnce(false);
@@ -356,13 +368,14 @@ describe('Cart actions', () => {
 
     it('performs a cart update request with dry run and forcing client state if its configured to do so', () => {
       const contextMock = {
+        rootGetters: { checkout: { isUserInCheckout: () => false } },
         dispatch: jest.fn(),
         state: {
           cartItems: [],
           cartServerToken: 'some-token',
           cartItemsHash: 'some-sha-hash',
           cartServerPullAt: 1000000000,
-          cartServerMethodsRefreshAt: 1000000000,
+          cartServerMethodsRefreshAt: 1000000000
         }
       };
 
@@ -377,16 +390,17 @@ describe('Cart actions', () => {
 
       wrapper(cartActions);
 
-      expect(TaskQueue.execute).toBeCalledWith(expect.objectContaining({ dry_run: true, force_client_state: true, }));
+      expect(TaskQueue.execute).toBeCalledWith(expect.objectContaining({ dry_run: true, force_client_state: true }));
     });
 
     it('does not do anything if last cart sync was recently and the cart state hasn\'t been changed since then', () => {
       const contextMock = {
+        rootGetters: { checkout: { isUserInCheckout: () => false } },
         dispatch: jest.fn(),
         state: {
           cartServerToken: 'some-token',
           cartItemsHash: 'some-sha-hash',
-          cartServerPullAt: 1000000000,
+          cartServerPullAt: 1000000000
         }
       };
 
@@ -405,7 +419,8 @@ describe('Cart actions', () => {
 
     it('does not do anything if synchronization is off', () => {
       const contextMock = {
-        dispatch: jest.fn(),
+        rootGetters: { checkout: { isUserInCheckout: () => false } },
+        dispatch: jest.fn()
       };
 
       config.cart = { synchronize: false };
@@ -419,6 +434,7 @@ describe('Cart actions', () => {
 
     it('does not do anything in SSR environment', () => {
       const contextMock = {
+        rootGetters: { checkout: { isUserInCheckout: () => false } },
         dispatch: jest.fn()
       };
 
@@ -433,11 +449,12 @@ describe('Cart actions', () => {
   });
 
   describe('serverTotals', () => {
-
     it('pulls latest totals from server', async () => {
       const contextMock = {
+        rootGetters: { checkout: { isUserInCheckout: () => false } },
         state: {
-          cartServerTotalsAt: 1000000000,
+          cartServerToken: 'some-token',
+          cartServerTotalsAt: 1000000000
         }
       };
 
@@ -456,8 +473,10 @@ describe('Cart actions', () => {
 
     it('pulls latest totals from server forcing client state if it\'s configured to do so', async () => {
       const contextMock = {
+        rootGetters: { checkout: { isUserInCheckout: () => false } },
         state: {
-          cartServerTotalsAt: 1000000000,
+          cartServerToken: 'some-token',
+          cartServerTotalsAt: 1000000000
         }
       };
 
@@ -476,8 +495,10 @@ describe('Cart actions', () => {
 
     it('does not do anything if last totals sync was done recently', () => {
       const contextMock = {
+        rootGetters: { checkout: { isUserInCheckout: () => false } },
         state: {
-          cartServerTotalsAt: 1000000000,
+          cartServerToken: 'some-token',
+          cartServerTotalsAt: 1000000000
         }
       };
 
@@ -494,7 +515,12 @@ describe('Cart actions', () => {
     });
 
     it('does not do anything if totals synchronization is off', () => {
-      const contextMock = {};
+      const contextMock = {
+        rootGetters: { checkout: { isUserInCheckout: () => false } },
+        state: {
+          cartServerToken: 'some-token'
+        }
+      };
 
       config.cart = { synchronize_totals: false };
 
@@ -519,11 +545,10 @@ describe('Cart actions', () => {
   });
 
   describe('serverCreate', () => {
-
     it('requests to backend for creation of a new cart', async () => {
       const contextMock = {
         state: {
-          cartServerCreatedAt: 1000000000,
+          cartServerCreatedAt: 1000000000
         }
       };
 
@@ -542,8 +567,9 @@ describe('Cart actions', () => {
 
     it('requests to backend for creation of guest cart', async () => {
       const contextMock = {
+        rootGetters: { checkout: { isUserInCheckout: () => false } },
         state: {
-          cartServerCreatedAt: 1000000000,
+          cartServerCreatedAt: 1000000000
         }
       };
 
@@ -565,7 +591,7 @@ describe('Cart actions', () => {
     it('does not do anything if last totals sync was done recently', () => {
       const contextMock = {
         state: {
-          cartServerCreatedAt: 1000000000,
+          cartServerCreatedAt: 1000000000
         }
       };
 
@@ -607,12 +633,11 @@ describe('Cart actions', () => {
   });
 
   describe('serverUpdateItem', () => {
-
     it('sends an item update request to backend server and updates totals', async () => {
       const contextMock = {
         dispatch: jest.fn(),
         state: {
-          cartServerToken: "SOME-TOKEN",
+          cartServerToken: 'SOME-TOKEN',
           cartItems: [{sku: '123'}]
         }
       };
@@ -642,7 +667,7 @@ describe('Cart actions', () => {
       const contextMock = {
         dispatch: jest.fn(),
         state: {
-          cartServerToken: "SOME-TOKEN",
+          cartServerToken: 'SOME-TOKEN'
         }
       };
 
@@ -666,7 +691,7 @@ describe('Cart actions', () => {
         payload: {
           body: '{"cartItem":{"sku":"123","quoteId":"SOME-TOKEN"}}',
           headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
           },
           method: 'POST',
           mode: 'cors'
@@ -678,7 +703,7 @@ describe('Cart actions', () => {
       const contextMock = {
         dispatch: jest.fn(),
         state: {
-          cartServerToken: "SOME-TOKEN",
+          cartServerToken: 'SOME-TOKEN',
           cartItems: []
         }
       };
@@ -708,7 +733,7 @@ describe('Cart actions', () => {
       const contextMock = {
         dispatch: jest.fn(),
         state: {
-          cartServerToken: "SOME-TOKEN",
+          cartServerToken: 'SOME-TOKEN',
           cartItems: [{sku: '123'}]
         }
       };
@@ -735,12 +760,12 @@ describe('Cart actions', () => {
   });
 
   describe('serverDeleteItem', () => {
-
     it('sends a delete item from cart request to backend server and updates totals', async () => {
+      isOnlineSpy.mockReturnValueOnce(true);
       const contextMock = {
         dispatch: jest.fn(),
         state: {
-          cartServerToken: "SOME-TOKEN",
+          cartServerToken: 'SOME-TOKEN',
           cartItems: [{sku: '123'}]
         }
       };
@@ -771,7 +796,7 @@ describe('Cart actions', () => {
       const contextMock = {
         dispatch: jest.fn(),
         state: {
-          cartServerToken: "SOME-TOKEN",
+          cartServerToken: 'SOME-TOKEN'
         }
       };
 
@@ -795,7 +820,7 @@ describe('Cart actions', () => {
         payload: {
           body: '{"cartItem":{"sku":"123","quoteId":"SOME-TOKEN"}}',
           headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
           },
           method: 'POST',
           mode: 'cors'
@@ -805,13 +830,13 @@ describe('Cart actions', () => {
 
     it('sends a delete item from cart request but doesn\'t call refresh totals if the cart after update is empty', async () => {
       const cartItemMock = {
-        sku: '123',
+        sku: '123'
       };
 
       const contextMock = {
         dispatch: jest.fn(),
         state: {
-          cartServerToken: "SOME-TOKEN",
+          cartServerToken: 'SOME-TOKEN',
           cartItems: [cartItemMock]
         }
       };
@@ -843,7 +868,7 @@ describe('Cart actions', () => {
       const contextMock = {
         dispatch: jest.fn(),
         state: {
-          cartServerToken: "SOME-TOKEN",
+          cartServerToken: 'SOME-TOKEN',
           cartItems: [cartItemMock]
         }
       };

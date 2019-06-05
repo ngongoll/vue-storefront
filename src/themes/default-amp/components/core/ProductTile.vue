@@ -50,18 +50,17 @@
 <script>
 import rootStore from '@vue-storefront/core/store'
 import { ProductTile } from '@vue-storefront/core/modules/catalog/components/ProductTile.ts'
+import config from 'config'
 
 export default {
   mixins: [ProductTile],
   props: {
     labelsActive: {
       type: Boolean,
-      requred: false,
       default: true
     },
     onlyImage: {
       type: Boolean,
-      required: false,
       default: false
     }
   },
@@ -73,7 +72,7 @@ export default {
     },
     visibilityChanged (isVisible, entry) {
       if (isVisible) {
-        if (rootStore.state.config.products.configurableChildrenStockPrefetchDynamic && rootStore.products.filterUnavailableVariants) {
+        if (config.products.configurableChildrenStockPrefetchDynamic && rootStore.products.filterUnavailableVariants) {
           const skus = [this.product.sku]
           if (this.product.type_id === 'configurable' && this.product.configurable_children && this.product.configurable_children.length > 0) {
             for (const confChild of this.product.configurable_children) {
